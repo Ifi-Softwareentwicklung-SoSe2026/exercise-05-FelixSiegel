@@ -19,7 +19,7 @@ tags: [Sommersemester2026, Softwareentwicklung, Übung05]
 
 -->
 
-[![LiaScript Course](https://raw.githubusercontent.com/LiaScript/LiaScript/master/badges/course.svg)](https://liascript.github.io/course/?https://raw.githubusercontent.com/Ifi-Softwareentwicklung-SoSe2026/exercise_05/refs/heads/main/README.md)
+[![LiaScript Course](https://raw.githubusercontent.com/LiaScript/LiaScript/master/badges/course.svg)](https://liascript.github.io/course/?https://raw.githubusercontent.com/Ifi-Softwareentwicklung-SoSe2026/exercise-05-FelixSiegel/refs/heads/main/README.md)
 
 # Aufgabe 05
 
@@ -136,4 +136,71 @@ Kevin ersetzt den folgenden Platzhalter mit einem LiaScript-kompatiblen PlantUML
 - [plantUml Editor](https://pantuml.com)
 - paste and copy your code! Mit Reloads verlieren Sie Ihre Eingaben, daher vorher sichern!
 
-<!-- kevin:uml-diagram -->
+<!-- kevin-uml:start -->
+```text @plantUML
+@startuml
+skinparam classAttributeIconSize 0
+
+class TurnierManager {
+    - games: List<Spiel>
+    - teams: List<Mannschaft>
+    - users: List<Benutzer>
+    + initializeTurnier(): void
+    + saveToFile(filename: string): void
+    + loadFromFile(filename: string): void
+    + getSpielById(id: int): Spiel
+    + getBenutzerByName(name: string): Benutzer
+}
+
+class Mannschaft {
+    + name: string
+}
+
+class Spiel {
+    + spielId: int
+    + homeTeam: Mannschaft
+    + awayTeam: Mannschaft
+    + datum: DateTime
+    + uhrzeit: Time
+    + ergebnis: string
+    - quotes: List<Wettquote>
+    + setQuote(type: string, value: double): void
+    + getQuote(type: string): double
+    + setResult(score: string): void
+}
+
+class Wettquote {
+    + wetttyp: string
+    + quote: double
+}
+
+class Benutzer {
+    + name: string
+    + guthaben: double
+    + updateBalance(amount: double): void
+}
+
+class Wette {
+    + wetttyp: string
+    + quote: double
+    + einsatz: double
+    + isEvaluated: boolean
+    + evaluate(actualResult: string): double
+}
+
+TurnierManager "1" o-- "*" Spiel
+TurnierManager "1" o-- "*" Mannschaft
+TurnierManager "1" o-- "*" Benutzer
+
+Spiel "*" o-- "2" Mannschaft : teilnehmend
+Spiel "1" *-- "*" Wettquote : besitzt
+
+Wette "*" --> "1" Benutzer : platziert von
+Wette "*" --> "1" Spiel : bezieht sich auf
+
+note right of TurnierManager : Steuert Persistenz
+und CLI-Logik
+@enduml
+```
+@plantUML.eval(png)
+<!-- kevin-uml:end -->
