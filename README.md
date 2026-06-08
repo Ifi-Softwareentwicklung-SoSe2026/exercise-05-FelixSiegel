@@ -154,7 +154,9 @@ class TurnierManager {
     + setQuote(spielId: int, type: string, quote: double): void
     + getQuote(spielId: int, type: string): double
     + placeBid(playerName: string, spielId: int, type: string, amount: double): void
-    + processResult(spielId: int, score: string): void
+    + setResult(spielId: int, score: string): void
+    + getSpielById(id: int): Spiel
+    + getBenutzerByName(name: string): Benutzer
 }
 
 class Gruppe {
@@ -190,7 +192,7 @@ class Benutzer {
     + guthaben: double
     - myBets: List<Wette>
     + updateBalance(amount: double): void
-    + addBet(bet: Wette): void
+    + addWette(wette: Wette): void
 }
 
 class Wette {
@@ -210,6 +212,7 @@ Gruppe "1" *-- "*" Mannschaft : enthält
 Spiel "*" o-- "2" Mannschaft : teilnehmend
 Spiel "1" *-- "*" Wettquote : besitzt
 
+Wette "*" --> "1" Benutzer : platziert von
 Benutzer "1" o-- "*" Wette : verwaltet
 Wette "*" --> "1" Spiel : bezieht sich auf
 
