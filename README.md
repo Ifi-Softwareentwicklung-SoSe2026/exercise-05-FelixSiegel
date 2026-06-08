@@ -174,7 +174,7 @@ class Spiel {
     + homeTeam: Mannschaft
     + awayTeam: Mannschaft
     + datum: DateTime
-    + uhrzeit: Time
+    + uhrzeit: TimeOnly
     + ergebnis: string
     - quotes: List<Wettquote>
     + setQuote(type: string, value: double): void
@@ -207,13 +207,13 @@ TurnierManager "1" o-- "*" Spiel
 TurnierManager "1" o-- "*" Gruppe
 TurnierManager "1" o-- "*" Benutzer
 TurnierManager "1" o-- "*" Wette
+TurnierManager "1" o-- "*" Mannschaft
 
-Gruppe "1" *-- "*" Mannschaft : enthält
+Gruppe "1" o-- "*" Mannschaft : enthält
 Spiel "*" o-- "2" Mannschaft : teilnehmend
 Spiel "1" *-- "*" Wettquote : besitzt
 
 Wette "*" --> "1" Benutzer : platziert von
-Benutzer "1" o-- "*" Wette : verwaltet
 Wette "*" --> "1" Spiel : bezieht sich auf
 
 note right of TurnierManager : Zentraler Einstiegspunkt für
