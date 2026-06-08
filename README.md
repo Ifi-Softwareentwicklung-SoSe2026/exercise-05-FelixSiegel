@@ -144,12 +144,23 @@ skinparam classAttributeIconSize 0
 class TurnierManager {
     - games: List<Spiel>
     - teams: List<Mannschaft>
+    - groups: List<Gruppe>
     - users: List<Benutzer>
+    - bets: List<Wette>
     + initializeTurnier(): void
-    + saveToFile(filename: string): void
-    + loadFromFile(filename: string): void
-    + getSpielById(id: int): Spiel
-    + getBenutzerByName(name: string): Benutzer
+    + saveAllData(filename: string): void
+    + loadAllData(filename: string): void
+    + printGames(): void
+    + setQuote(spielId: int, type: string, quote: double): void
+    + getQuote(spielId: int, type: string): double
+    + placeBid(playerName: string, spielId: int, type: string, amount: double): void
+    + processResult(spielId: int, score: string): void
+}
+
+class Gruppe {
+    + name: string
+    - teams: List<Mannschaft>
+    + addTeam(team: Mannschaft): void
 }
 
 class Mannschaft {
@@ -177,7 +188,9 @@ class Wettquote {
 class Benutzer {
     + name: string
     + guthaben: double
+    - myBets: List<Wette>
     + updateBalance(amount: double): void
+    + addBet(bet: Wette): void
 }
 
 class Wette {
@@ -189,17 +202,19 @@ class Wette {
 }
 
 TurnierManager "1" o-- "*" Spiel
-TurnierManager "1" o-- "*" Mannschaft
+TurnierManager "1" o-- "*" Gruppe
 TurnierManager "1" o-- "*" Benutzer
+TurnierManager "1" o-- "*" Wette
 
+Gruppe "1" *-- "*" Mannschaft : enthält
 Spiel "*" o-- "2" Mannschaft : teilnehmend
 Spiel "1" *-- "*" Wettquote : besitzt
 
-Wette "*" --> "1" Benutzer : platziert von
+Benutzer "1" o-- "*" Wette : verwaltet
 Wette "*" --> "1" Spiel : bezieht sich auf
 
-note right of TurnierManager : Steuert Persistenz
-und CLI-Logik
+note right of TurnierManager : Zentraler Einstiegspunkt für
+Persistenz und CLI-Befehle
 @enduml
 ```
 @plantUML.eval(png)
