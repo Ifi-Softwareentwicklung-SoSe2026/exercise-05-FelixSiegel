@@ -6,3 +6,4 @@ var manager = new TurnierManager();
 
 manager.initializeTurnier();
 manager.printGames();
+manager.saveAllData("test.json");

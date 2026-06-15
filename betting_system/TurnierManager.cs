@@ -8,6 +8,11 @@ public class TurnierManager {
     private List<Benutzer> users = new();
     private List<Wette> bets = new();
 
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        WriteIndented = true
+    };
+
 
     // Helper methods to create objects
     private Gruppe createGroup(string name, params string[] teamNames) {
@@ -112,7 +117,43 @@ public class TurnierManager {
         Console.WriteLine($"Turnier initialisiert: {teams.Count} Mannschaften, {groups.Count} Gruppen, {games.Count} Spiele.");
     }
 
-    public void saveAllData(string filename) {}
+    public void saveAllData(string filename) {
+        var data = new TurnierData {
+            Mannschaften = teams.Select(t => new MannschaftDto { Name = t.Name }).ToList(),
+            Gruppen = groups.Select(g => new GruppeDto {
+                Name = g.Name,
+                TeamNames = g.Teams.Select(t => t.Name).ToList()
+            }).ToList(),
+            Spiele = games.Select(s => new SpielDto {
+                SpielId      = s.SpielId,
+                HomeTeamName = s.HomeTeam.Name,
+                AwayTeamName = s.AwayTeam.Name,
+                Datum        = s.Datum,
+                Uhrzeit      = s.Uhrzeit.ToString("HH:mm"),
+                Ergebnis     = s.Ergebnis,
+                Quotes       = s.Quotes.Select(q => new WettquoteDto {
+                    Wetttyp = q.Wetttyp,
+                    Quote   = q.Quote
+                }).ToList()
+            }).ToList(),
+            Benutzer = users.Select(b => new BenutzerDto {
+                Name     = b.Name,
+                Guthaben = b.Guthaben
+            }).ToList(),
+            Wetten = bets.Select(w => new WetteDto {
+                BenutzerName = w.BenutzerName,
+                SpielId      = w.SpielId,
+                Wetttyp      = w.Wetttyp,
+                Quote        = w.Quote,
+                Einsatz      = w.Einsatz,
+                IsEvaluated  = w.IsEvaluated
+            }).ToList()
+        };
+
+        var json = JsonSerializer.Serialize(data, JsonOptions);
+        File.WriteAllText(filename, json);
+        Console.WriteLine($"Daten gespeichert: {filename}");
+    }
 
     public void loadAllData(string filename) {}
 
