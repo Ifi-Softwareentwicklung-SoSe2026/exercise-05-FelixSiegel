@@ -157,6 +157,7 @@ class TurnierManager {
     + setResult(spielId: int, score: string): void
     + getSpielById(id: int): Spiel
     + getBenutzerByName(name: string): Benutzer
+    - getOrCreateBenutzer(name: string): Benutzer
 }
 
 class Gruppe {
