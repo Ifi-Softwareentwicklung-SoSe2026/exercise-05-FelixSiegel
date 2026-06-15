@@ -19,7 +19,7 @@ tags: [Sommersemester2026, Softwareentwicklung, Übung05]
 
 -->
 
-[![LiaScript Course](https://raw.githubusercontent.com/LiaScript/LiaScript/master/badges/course.svg)](https://liascript.github.io/course/?https://raw.githubusercontent.com/Ifi-Softwareentwicklung-SoSe2026/exercise_05/refs/heads/main/README.md)
+[![LiaScript Course](https://raw.githubusercontent.com/LiaScript/LiaScript/master/badges/course.svg)](https://liascript.github.io/course/?https://raw.githubusercontent.com/Ifi-Softwareentwicklung-SoSe2026/exercise-05-FelixSiegel/refs/heads/main/README.md)
 
 # Aufgabe 05
 
@@ -136,4 +136,89 @@ Kevin ersetzt den folgenden Platzhalter mit einem LiaScript-kompatiblen PlantUML
 - [plantUml Editor](https://pantuml.com)
 - paste and copy your code! Mit Reloads verlieren Sie Ihre Eingaben, daher vorher sichern!
 
-<!-- kevin:uml-diagram -->
+<!-- kevin-uml:start -->
+```text @plantUML
+@startuml
+skinparam classAttributeIconSize 0
+
+class TurnierManager {
+    - games: List<Spiel>
+    - teams: List<Mannschaft>
+    - groups: List<Gruppe>
+    - users: List<Benutzer>
+    - bets: List<Wette>
+    + initializeTurnier(): void
+    + saveAllData(filename: string): void
+    + loadAllData(filename: string): void
+    + printGames(): void
+    + setQuote(spielId: int, type: string, quote: double): void
+    + getQuote(spielId: int, type: string): double
+    + placeBid(playerName: string, spielId: int, type: string, amount: double): void
+    + setResult(spielId: int, score: string): void
+    + getSpielById(id: int): Spiel
+    + getBenutzerByName(name: string): Benutzer
+}
+
+class Gruppe {
+    + name: string
+    - teams: List<Mannschaft>
+    + addTeam(team: Mannschaft): void
+}
+
+class Mannschaft {
+    + name: string
+}
+
+class Spiel {
+    + spielId: int
+    + homeTeam: Mannschaft
+    + awayTeam: Mannschaft
+    + datum: DateTime
+    + uhrzeit: TimeOnly
+    + ergebnis: string
+    - quotes: List<Wettquote>
+    + setQuote(type: string, value: double): void
+    + getQuote(type: string): double
+    + setResult(score: string): void
+}
+
+class Wettquote {
+    + wetttyp: string
+    + quote: double
+}
+
+class Benutzer {
+    + name: string
+    + guthaben: double
+    - myBets: List<Wette>
+    + updateBalance(amount: double): void
+    + addWette(wette: Wette): void
+}
+
+class Wette {
+    + wetttyp: string
+    + quote: double
+    + einsatz: double
+    + isEvaluated: boolean
+    + evaluate(actualResult: string): double
+}
+
+TurnierManager "1" o-- "*" Spiel
+TurnierManager "1" o-- "*" Gruppe
+TurnierManager "1" o-- "*" Benutzer
+TurnierManager "1" o-- "*" Wette
+TurnierManager "1" o-- "*" Mannschaft
+
+Gruppe "1" o-- "*" Mannschaft : enthält
+Spiel "*" o-- "2" Mannschaft : teilnehmend
+Spiel "1" *-- "*" Wettquote : besitzt
+
+Wette "*" --> "1" Benutzer : platziert von
+Wette "*" --> "1" Spiel : bezieht sich auf
+
+note right of TurnierManager : Zentraler Einstiegspunkt für
+Persistenz und CLI-Befehle
+@enduml
+```
+@plantUML.eval(png)
+<!-- kevin-uml:end -->
