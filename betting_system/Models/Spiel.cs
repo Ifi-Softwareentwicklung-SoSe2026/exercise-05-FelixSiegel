@@ -42,6 +42,6 @@ public class Spiel {
 
     public override string ToString()
     {
-        return $"[{SpielId:D2}] {Datum:dd.MM.yyyy} {Uhrzeit:HH:mm}  {HomeTeam.Name,-20} vs  {AwayTeam.Name,-20}  Ergebnis: {Ergebnis}";
+        return $"[{SpielId:D2}] {Datum:dd.MM.yyyy} {Uhrzeit:HH:mm} {HomeTeam.Name,-20} vs  {AwayTeam.Name,-20} Ergebnis: {Ergebnis}";
     }
 }

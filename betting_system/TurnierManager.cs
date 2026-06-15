@@ -1,3 +1,4 @@
+using System.Text.Json;
 using wm;
 
 public class TurnierManager {
@@ -115,7 +116,61 @@ public class TurnierManager {
 
     public void loadAllData(string filename) {}
 
-    public void printGames() {}
+    public void printGames() {
+        Console.WriteLine();
+        Console.WriteLine("╔══════════════════════════════════════════════════════════════════════════════════╗");
+        Console.WriteLine("║              FIFA Weltmeisterschaft 2026 – Gruppenphase Spielplan                ║");
+        Console.WriteLine("╠══════════════════════════════════════════════════════════════════════════════════╣");
+
+        var byGroup = new Dictionary<string, List<Spiel>>();
+
+        foreach (var gruppe in groups)
+        {
+            var groupGames = games.Where(g =>
+                gruppe.Teams.Any(t => t.Name == g.HomeTeam.Name) &&
+                gruppe.Teams.Any(t => t.Name == g.AwayTeam.Name)).ToList();
+            byGroup[gruppe.Name] = groupGames;
+        }
+
+        // Games not assigned to any group
+        var assignedIds = byGroup.Values.SelectMany(l => l).Select(g => g.SpielId).ToHashSet();
+        var unassigned  = games.Where(g => !assignedIds.Contains(g.SpielId)).ToList();
+
+        foreach (var (groupName, groupGames) in byGroup.OrderBy(kv => kv.Key))
+        {
+            if (!groupGames.Any()) continue;
+
+            Console.WriteLine($"║  Gruppe {groupName}                                                                        ║");
+            Console.WriteLine("╠══════════════════════════════════════════════════════════════════════════════════╣");
+
+            foreach (var spiel in groupGames.OrderBy(s => s.Datum).ThenBy(s => s.Uhrzeit))
+            {
+                var quotes = spiel.Quotes.Any()
+                    ? $"  Quote 1/X/2: {spiel.getQuote("1"):F2} / {spiel.getQuote("X"):F2} / {spiel.getQuote("2"):F2}"
+                    : "";
+                Console.WriteLine($"║  {spiel,-80}║");
+                if (!string.IsNullOrEmpty(quotes))
+                    Console.WriteLine($"║  {quotes,-80}║");
+            }
+
+            Console.WriteLine("╠══════════════════════════════════════════════════════════════════════════════════╣");
+        }
+
+        if (unassigned.Any())
+        {
+            Console.WriteLine("║  Weitere Spiele                                                                  ║");
+            Console.WriteLine("╠══════════════════════════════════════════════════════════════════════════════════╣");
+            foreach (var spiel in unassigned.OrderBy(s => s.SpielId))
+                Console.WriteLine($"║  {spiel,-80}║");
+            Console.WriteLine("╠══════════════════════════════════════════════════════════════════════════════════╣");
+        }
+
+        Console.WriteLine($"║  Gesamt: {games.Count} Spiele  |  {teams.Count} Mannschaften  |  {groups.Count} Gruppen" +
+                          $"{"",29}║");
+        Console.WriteLine("╚══════════════════════════════════════════════════════════════════════════════════╝");
+        Console.WriteLine();
+
+    }
 
     public void setQuote(int spielId, string type, double quote) {
         var spiel = getSpielById(spielId);
