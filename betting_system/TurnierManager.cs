@@ -155,7 +155,69 @@ public class TurnierManager {
         Console.WriteLine($"Daten gespeichert: {filename}");
     }
 
-    public void loadAllData(string filename) {}
+    public void loadAllData(string filename) {
+        if (!File.Exists(filename))
+            throw new FileNotFoundException($"Datei nicht gefunden: {filename}");
+
+        var json = File.ReadAllText(filename);
+        var data = JsonSerializer.Deserialize<TurnierData>(json, JsonOptions)
+                   ?? throw new InvalidDataException("Ungültige JSON-Datei.");
+
+        teams.Clear();
+        groups.Clear();
+        games.Clear();
+        users.Clear();
+        bets.Clear();
+
+        // Rebuild teams
+        foreach (var dto in data.Mannschaften)
+            teams.Add(new Mannschaft(dto.Name));
+
+        // Rebuild groups
+        foreach (var dto in data.Gruppen)
+        {
+            var gruppe = new Gruppe(dto.Name);
+            foreach (var tName in dto.TeamNames)
+            {
+                var team = teams.First(t => t.Name == tName);
+                gruppe.addTeam(team);
+            }
+            groups.Add(gruppe);
+        }
+
+        // Rebuild games
+        foreach (var dto in data.Spiele)
+        {
+            var home = teams.First(t => t.Name == dto.HomeTeamName);
+            var away = teams.First(t => t.Name == dto.AwayTeamName);
+            var uhrzeit = TimeOnly.ParseExact(dto.Uhrzeit, "HH:mm");
+            var spiel = new Spiel(dto.SpielId, home, away, dto.Datum, uhrzeit)
+            {
+                Ergebnis = dto.Ergebnis
+            };
+            foreach (var q in dto.Quotes)
+                spiel.setQuote(q.Wetttyp, q.Quote);
+            games.Add(spiel);
+        }
+
+        // Rebuild users
+        foreach (var dto in data.Benutzer)
+            users.Add(new Benutzer(dto.Name, dto.Guthaben));
+
+        // Rebuild bets
+        foreach (var dto in data.Wetten)
+        {
+            var wette = new Wette(dto.Wetttyp, dto.Quote, dto.Einsatz, dto.BenutzerName, dto.SpielId)
+            {
+                IsEvaluated = dto.IsEvaluated
+            };
+            bets.Add(wette);
+            var benutzer = users.FirstOrDefault(u => u.Name == dto.BenutzerName);
+            benutzer?.addWette(wette);
+        }
+
+        Console.WriteLine($"Daten geladen: {filename}  ({teams.Count} Teams, {games.Count} Spiele)");
+    }
 
     public void printGames() {
         Console.WriteLine();
