@@ -19,10 +19,13 @@ public class Wette {
 
     public Wette() {}
 
-    public Wette(string typ, double quote, double einsatz) {
+    public Wette(string typ, double quote, double einsatz, string benutzerName, int spielId) {
         Wetttyp = typ;
         Quote = quote;
         Einsatz = einsatz;
+        BenutzerName = benutzerName;
+        SpielId = spielId;
+        IsEvaluated = false;
     }
 
     public double evaluate(string actualResult) {
