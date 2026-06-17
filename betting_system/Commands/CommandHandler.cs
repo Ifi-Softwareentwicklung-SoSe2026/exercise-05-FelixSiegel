@@ -18,8 +18,12 @@ public static class CommandHandler {
             case "print":
                 PrintGame(manager, args);
                 break;
+            case "help":
+                PrintUsage();
+                break;
             default:
                 Console.WriteLine($"Unbekannter Befehl: '{command}'");
+                PrintUsage();
                 break;
         }
     ;}
@@ -45,4 +49,17 @@ public static class CommandHandler {
         }
         manager.printGames();
     }
+
+    private static void PrintUsage() {
+        Console.WriteLine();
+        Console.WriteLine("Usage:  dotnet run -- <Befehl> [file]");
+        Console.WriteLine();
+        Console.WriteLine("  new   [file]   Neues Turnier anlegen und speichern");
+        Console.WriteLine($"                  Standard-Datei: {DefaultFileName}.json");
+        Console.WriteLine();
+        Console.WriteLine("  print [file]   Spielplan des gespeicherten Turniers ausgeben");
+        Console.WriteLine($"                  Standard-Datei: {DefaultFileName}.json");
+        Console.WriteLine();
+    }
+
 }
