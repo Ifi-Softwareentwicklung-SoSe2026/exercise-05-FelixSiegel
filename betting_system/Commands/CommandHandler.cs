@@ -18,6 +18,9 @@ public static class CommandHandler {
             case "print":
                 PrintGame(manager, args);
                 break;
+            case "set":
+                HandleSet(manager, args);
+                break;
             case "help":
                 PrintUsage();
                 break;
@@ -48,6 +51,47 @@ public static class CommandHandler {
             return;
         }
         manager.printGames();
+    }
+
+    public static void HandleSet(TurnierManager manager, string[] args) {
+        // set <spielId> <wetttyp> <quote> [datei]
+        if (args.Length < 4) {
+            Console.WriteLine("Verwendung: set <spielId> <Wetttyp> <Quote> [datei]");
+            Console.WriteLine("Beispiel:   set 1 1 1.85");
+            Console.WriteLine("Wetttypen:  1 (Heimsieg), X (Unentschieden), 2 (Auswärtssieg)");
+            Console.WriteLine("            1X, X2, 12 (Doppelte Chance)");
+            return;
+        }
+
+        if (!int.TryParse(args[1], out int spielId)) {
+            Console.WriteLine($"Unfültige Spiel-Id: '{args[1]}' muss ganzzahlig sein.");
+            return;
+        }
+
+        var wetttyp = args[2].ToUpperInvariant();
+
+        if (!double.TryParse(args[3], out double quote) || quote <= 1.0) {
+            Console.WriteLine($"Ungültige Quote: '{args[3]}' muss dezimal sein und größer als 1.0.");
+            return;
+        }
+
+        var filename = args.Length > 4 ? args[4] : DefaultFileName;
+
+        try {
+            // load existing data to make sure we dont override anything
+            if (File.Exists(filename)) {
+                manager.loadAllData(filename);
+            } else {
+                Console.WriteLine($"Keine Datei '{filename}' gefunden. Initialisiere neues Turnier.");
+                manager.initializeTurnier();
+            }
+
+            manager.setQuote(spielId, wetttyp, quote);
+            Console.WriteLine($"Quote gesetzt: Spiel {spielId} | {wetttyp} = {quote:F2}");
+            manager.saveAllData(filename);
+        } catch (Exception e) {
+            Console.WriteLine($"Error: {e.Message}");
+        }
     }
 
     private static void PrintUsage() {
