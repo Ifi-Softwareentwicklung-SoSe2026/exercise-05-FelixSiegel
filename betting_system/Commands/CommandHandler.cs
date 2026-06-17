@@ -15,6 +15,9 @@ public static class CommandHandler {
             case "new":
                 HandleNew(manager, args);
                 break;
+            case "print":
+                PrintGame(manager, args);
+                break;
             default:
                 Console.WriteLine($"Unbekannter Befehl: '{command}'");
                 break;
@@ -28,5 +31,18 @@ public static class CommandHandler {
         manager.initializeTurnier();
         manager.saveAllData(filename);
         Console.WriteLine($"Neues Turnier wurde erstellt und in '{filename}' gespeichert.");
+    }
+
+    public static void PrintGame(TurnierManager manager, string[] args) {
+        var filename = args.Length > 1 ? args[1] : DefaultFileName;
+
+        if (File.Exists(filename)) {
+            Console.WriteLine($"Lade Turnier aus '{filename}'...");
+            manager.loadAllData(filename);
+        } else {
+            Console.WriteLine($"Keine Datei '{filename}' gefunden.");
+            return;
+        }
+        manager.printGames();
     }
 }
